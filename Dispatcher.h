@@ -3,6 +3,7 @@
 
 #include <omnetpp.h>
 #include <vector>
+#include <string.h>
 
 using namespace omnetpp;
 
@@ -11,14 +12,23 @@ using namespace omnetpp;
  */
 class Dispatcher : public cSimpleModule
 {
-  protected:
+public:
+    virtual ~Dispatcher();
+
+protected:
     virtual void initialize();
     virtual void handleMessage(cMessage *msg);
 
-  private:
+private:
     const char *sid_label;
+    int k_limit;
+    int n_server;
     std::vector<int> server_list;
+    void sendJob(cMessage *msg, int sid);
+    void serverUpdate(cMessage *msg);
 
+    void SQ_policy();
+    void MemSQ_policy();
 };
 
 #endif

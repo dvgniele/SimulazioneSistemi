@@ -2,7 +2,7 @@
 #define __SIMSYS_SERVERLIST_H_
 
 #include <omnetpp.h>
-#include "Server.h"
+#include "Queue.h"
 #include <vector>
 
 using namespace omnetpp;
@@ -12,6 +12,9 @@ using namespace omnetpp;
  */
 class ServerList : public cSimpleModule
 {
+public:
+    ~ServerList();
+
   protected:
     virtual void initialize();
     virtual void handleMessage(cMessage *msg);
@@ -20,9 +23,7 @@ class ServerList : public cSimpleModule
     const char* Number_to_Char(int num);
     const char* Number_to_Char(double num);
     const char* Number_to_Char(float num);
-    std::vector<queueing::Server> *server_list;
-
-    void CheckPolicy(cMsgPar);
+    //std::vector<queueing::Queue> *server_list;
 
 };
 

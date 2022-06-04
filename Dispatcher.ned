@@ -20,6 +20,7 @@ simple Dispatcher
 {
     parameters:
     	volatile int n_servers;
+    	volatile int k_limit;
     gates:
         input in[];
         output out;
