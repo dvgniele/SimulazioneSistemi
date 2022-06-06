@@ -1,6 +1,14 @@
 out/clang-release//PoissonDelay.o: PoissonDelay.cc PoissonDelay.h \
-  F:\DEV\omnetpp-5.7-windows-x86_64\omnetpp-5.7\include\omnetpp.h
+  F:\DEV\omnetpp-5.7-windows-x86_64\omnetpp-5.7\include\omnetpp.h \
+  ..\queueinglib\Job.h ..\queueinglib\Job_m.h \
+  ..\queueinglib\QueueingDefs.h
 
 PoissonDelay.h:
 
 F:\DEV\omnetpp-5.7-windows-x86_64\omnetpp-5.7\include\omnetpp.h:
+
+..\queueinglib\Job.h:
+
+..\queueinglib\Job_m.h:
+
+..\queueinglib\QueueingDefs.h:

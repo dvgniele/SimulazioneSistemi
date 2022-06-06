@@ -16,7 +16,6 @@ network net
         string moduleName = "server";
         volatile double sTime @unit(s);
 
-
         @display("bgb=777,777");
     submodules:
         sorg: SourceOnce {

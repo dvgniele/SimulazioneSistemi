@@ -55,7 +55,7 @@ void ServerList::initialize()
 
     cout << "n_server: " << n_server << endl;
 
-    //  creazione connessioni tra ServerList ed i Server
+    //  creating connections with ServerList foreach server
     for (int i = 0; i < n_server; i++)
     {
         gate(sv_outGate.c_str(),i)->connectTo(server_list[i]->addGate("in", cGate::INPUT));
@@ -67,7 +67,7 @@ void ServerList::handleMessage(cMessage *msg)
 {
     cGate *arrivalGate = msg->getArrivalGate();
 
-    //  #####   MESSAGGIO IN ARRIVO DALL'ESTERNO
+    //  #####   MESSAGE INCOMING FROM EXTERNAL PORT
     if (arrivalGate == gate("ext_in"))
     {
         auto name = "server_id";
@@ -76,7 +76,7 @@ void ServerList::handleMessage(cMessage *msg)
 
         send(msg, sv_outGate.c_str(), id);
     }
-    else    //  #####   MESSAGGIO IN ARRIVO DA UN SERVER
+    else    //  #####   MESSAGE INCOMING FROM A SERVER
     {
         send(msg, "out");
     }

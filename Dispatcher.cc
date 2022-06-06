@@ -19,7 +19,7 @@ void Dispatcher::initialize()
     hasMemory = par("hasMemory");
 
     // int *jobs_per_server = new int[n_server];
-    memset(jobs_per_server, 0, n_server * sizeof(*jobs_per_server)); // imposta la dimensione della lista di jobs possibili per ogni server
+    memset(jobs_per_server, 0, n_server * sizeof(*jobs_per_server)); // sets the array size to the server count
 
     for (int i = 0; i < k_limit; i++)
         idle_servers.push_back(i);
@@ -37,7 +37,7 @@ void Dispatcher::handleMessage(cMessage *msg)
 
     if (arrivalGate == gate("source_in"))
     {
-        //  selezione del derver in base alla politica selezionata
+        //  selecting the server following the policy
         int sid;
         if (hasMemory)
             sid = MemSQ_policy();
@@ -58,28 +58,28 @@ void Dispatcher::handleMessage(cMessage *msg)
     }
 }
 
-// invia il job alla lista di server, e rimuove il server dalla lista di idle
+
 void Dispatcher::sendJob(cMessage *msg, int sid)
 {
-    removeFromIdleList(sid);
-    jobs_per_server[sid]++;
+    removeFromIdleList(sid);    //  removing the server id from the idle list
+    jobs_per_server[sid]++;     //  increasing the number of jobs of server sid
 
-    //  impostazione dei parametri del messaggio    //
-    //  set del parametro: server_id
+    /*  message parameters setting  */
+    // setting parameter: server_id
     msg->par("server_id").setDoubleValue(sid);
     // msg->addPar(mpar);
 
-    //  set del parametro: is_idle
+    //  setting parameter: is_idle
     msg->par("is_idle").setBoolValue(false);
 
-    //  set del parametro: n_jobs
+    //  setting parameter: n_jobs
     msg->par("n_jobs").setDoubleValue(jobs_per_server[sid]);
 
-    //  il job viene inviato
+    //  sending the job
     send(msg, "out");
 }
 
-//  vengono letti i parametri del messaggi, e viene decrementato il numero di job del server mittente
+
 void Dispatcher::serverUpdate(cMessage *msg, int sid)
 {
     jobs_per_server[sid]--;
