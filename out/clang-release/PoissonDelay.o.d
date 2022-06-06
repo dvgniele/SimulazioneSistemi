@@ -1,6 +1,6 @@
-out/clang-release//Dispatcher.o: Dispatcher.cc Dispatcher.h \
+out/clang-release//PoissonDelay.o: PoissonDelay.cc PoissonDelay.h \
   F:\DEV\omnetpp-5.7-windows-x86_64\omnetpp-5.7\include\omnetpp.h
 
-Dispatcher.h:
+PoissonDelay.h:
 
 F:\DEV\omnetpp-5.7-windows-x86_64\omnetpp-5.7\include\omnetpp.h:

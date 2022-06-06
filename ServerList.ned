@@ -1,4 +1,3 @@
-
 simple ServerList
 {
     parameters:

@@ -7,24 +7,19 @@
 
 using namespace omnetpp;
 
-/**
- * TODO - Generated class
- */
 class ServerList : public cSimpleModule
 {
-public:
-    ~ServerList();
 
-  protected:
+protected:
     virtual void initialize();
     virtual void handleMessage(cMessage *msg);
+    ~ServerList();
 
-  private:
-    const char* Number_to_Char(int num);
-    const char* Number_to_Char(double num);
-    const char* Number_to_Char(float num);
-    //std::vector<queueing::Queue> *server_list;
-
+private:
+    const char *NumberToChar(int num);
+    const char *NumberToChar(double num);
+    const char *NumberToChar(float num);
+    // std::vector<queueing::Queue> *server_list;
 };
 
 #endif

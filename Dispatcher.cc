@@ -1,5 +1,4 @@
 #include "Dispatcher.h"
-#include "DispatcherMessage.h"
 
 using namespace std;
 
@@ -17,16 +16,13 @@ void Dispatcher::initialize()
 
     const int n_server = par("n_servers");
     const int k_limit = par("k_limit");
+    hasMemory = par("hasMemory");
 
     // int *jobs_per_server = new int[n_server];
     memset(jobs_per_server, 0, n_server * sizeof(*jobs_per_server)); // imposta la dimensione della lista di jobs possibili per ogni server
-    jobs_per_server[3] = 2;
 
-    for (int i = 0; i < n_server; i++)
-    {
+    for (int i = 0; i < k_limit; i++)
         idle_servers.push_back(i);
-        // cout<< "jobs: "<< jobs_per_server[i] << endl;
-    }
 
 #pragma region log_variabili
     cout << "n_server: " << n_server << endl;
@@ -37,86 +33,87 @@ void Dispatcher::initialize()
 
 void Dispatcher::handleMessage(cMessage *msg)
 {
-
     cGate *arrivalGate = msg->getArrivalGate();
-    cout << "in arrivo da: " << arrivalGate->getName() << endl;
 
-    int sid = 2;
-
-    // auto dmsg = new DispatcherMessage(1);
-
-    //  se il messaggio non ha il parametro riguardante il server di servizio, lo si aggiunge
-    auto mpar = new cMsgPar();
-    if (!msg->hasPar(sid_label))
+    if (arrivalGate == gate("source_in"))
     {
-        mpar->setDoubleValue(sid);
-        mpar->setName(sid_label);
-        msg->addPar(mpar);
-    }
+        //  selezione del derver in base alla politica selezionata
+        int sid;
+        if (hasMemory)
+            sid = MemSQ_policy();
+        else
+            sid = SQ_policy();
 
-    //  se il messaggio non ha il parametro is_idle, viene creato ed impostato
-    //  a false dato che il server verr� considerato impegnato da tale job
-    mpar = new cMsgPar();
-    if (!msg->hasPar("is_idle"))
+        sendJob(msg, sid);
+    }
+    else
     {
-        mpar->setBoolValue(false);
-        mpar->setName("is_idle");
-        msg->addPar(mpar);
-    }
+        auto sid_par_name = "server_id";
+        auto sid_par = msg->par(sid_par_name);
+        auto sid = (int)sid_par.doubleValue();
 
-    //  se il messaggio non ha il parametro is_idle, viene creato ed impostato ad 1
-    mpar = new cMsgPar();
-    if (!msg->hasPar("n_jobs"))
-    {
-        mpar->setDoubleValue(1);
-        mpar->setName("n_jobs");
-        msg->addPar(mpar);
-    }
+        serverUpdate(msg, sid);
 
-    auto id = (int)mpar->doubleValue();
-    sendJob(msg, id);
+        send(msg, "sink_out");
+    }
 }
 
 // invia il job alla lista di server, e rimuove il server dalla lista di idle
 void Dispatcher::sendJob(cMessage *msg, int sid)
 {
+    removeFromIdleList(sid);
     jobs_per_server[sid]++;
 
-    //  viene creato un nuovo vettore contenente tutti i server in idle
-    //  escluso il server a cui si sta per inviare il job
-    vector<int> tmp;
-    for (auto id : idle_servers)
-        if (id != sid)
-            tmp.push_back(id);
+    //  impostazione dei parametri del messaggio    //
+    //  set del parametro: server_id
+    msg->par("server_id").setDoubleValue(sid);
+    // msg->addPar(mpar);
 
-    //  si sovrascrive la lista di server in idle, corretta
-    idle_servers.clear();
-    for (auto item : tmp)
-        idle_servers.push_back(item);
+    //  set del parametro: is_idle
+    msg->par("is_idle").setBoolValue(false);
+
+    //  set del parametro: n_jobs
+    msg->par("n_jobs").setDoubleValue(jobs_per_server[sid]);
 
     //  il job viene inviato
     send(msg, "out");
 }
 
 //  vengono letti i parametri del messaggi, e viene decrementato il numero di job del server mittente
-void Dispatcher::serverUpdate(cMessage *msg)
+void Dispatcher::serverUpdate(cMessage *msg, int sid)
 {
-    auto sid_par_name = "server_id";
-    auto idle_par_name = "server_idle";
-    auto sid_par = msg->par(sid_par_name);
+    jobs_per_server[sid]--;
+
+    auto idle_par_name = "is_idle";
     auto idle_par = msg->par(idle_par_name);
-    auto sid = (int)sid_par.doubleValue();
     auto isIdle = (int)idle_par.doubleValue();
 
-    jobs_per_server[sid]--;
+    if (isIdle && idle_servers.size() < k_limit)
+        idle_servers.push_back(sid);
 }
 
-void Dispatcher::SQ_policy()
+void Dispatcher::removeFromIdleList(int value)
 {
+    vector<int> tmp;
+
+    for (auto it : idle_servers)
+        if (it != value)
+            tmp.push_back(it);
+
+    idle_servers.clear();
+
+    for (auto it : tmp)
+        idle_servers.push_back(it);
 }
 
-void Dispatcher::MemSQ_policy()
+int Dispatcher::SQ_policy()
 {
+    return 1;
+}
+
+int Dispatcher::MemSQ_policy()
+{
+    return 1;
 }
 
 Dispatcher::~Dispatcher()

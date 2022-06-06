@@ -23,12 +23,14 @@ private:
     const char *sid_label;
     int k_limit;
     int n_server;
+    bool hasMemory;
     std::vector<int> server_list;
     void sendJob(cMessage *msg, int sid);
-    void serverUpdate(cMessage *msg);
+    void serverUpdate(cMessage *msg, int value);
+    void removeFromIdleList(int value);
 
-    void SQ_policy();
-    void MemSQ_policy();
+    int SQ_policy();
+    int MemSQ_policy();
 };
 
 #endif

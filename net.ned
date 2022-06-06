@@ -17,23 +17,28 @@ network net
         volatile double sTime @unit(s);
 
 
-        @display("bgb=769,417");
+        @display("bgb=777,777");
     submodules:
         sorg: SourceOnce {
-            @display("p=69,77");
+            @display("p=69,69");
         }
         disp_delay: Delay {
-            @display("p=494,77");
+            @display("p=570,211");
         }
         dispatcher: Dispatcher {
-            @display("p=197,77");
+            @display("p=160,211");
         }
         serverList: ServerList {
-            @display("p=361,222");
+            @display("p=379,530");
+        }
+        poissonDelay: PoissonDelay {
+            @display("p=160,69");
         }
     connections:
-        sorg.out --> dispatcher.in++;
         dispatcher.out --> disp_delay.in++;
-        serverList.out --> dispatcher.in++;
         disp_delay.out --> serverList.ext_in;
+        serverList.out --> dispatcher.in;
+        poissonDelay.out --> dispatcher.source_in;
+        sorg.out --> poissonDelay.src_in;
+        dispatcher.sink_out --> poissonDelay.ext_in;
 }
