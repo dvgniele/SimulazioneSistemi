@@ -18,7 +18,9 @@ void Dispatcher::initialize()
 
     sid_label = "server_id";
 
-    n_server = par("n_servers");
+    cModule* parent = getParentModule();
+
+    n_server = parent->par("n_servers");
     k_limit = par("k_limit");
     d_limit = par("d_limit");
     hasMemory = par("hasMemory");
