@@ -3,7 +3,8 @@ simple Dispatcher
     parameters:
     	volatile int n_servers;
     	volatile int k_limit;
-    	volatile bool hasMemory = false;
+    	volatile int d_limit;
+    	volatile bool hasMemory;
     gates:
         input source_in;	
         input in;

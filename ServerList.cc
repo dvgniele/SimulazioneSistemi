@@ -44,7 +44,7 @@ void ServerList::initialize()
         cModule* module = serverListModuleType->create(sv_name.c_str(), parent);
 
         double stime = parent->par("sTime").doubleValue();
-        cout << stime << endl;
+        //cout << stime << endl;
         module->par("serviceTime") = stime;
         module->finalizeParameters();
         module->buildInside();

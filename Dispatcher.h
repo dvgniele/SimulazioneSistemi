@@ -37,6 +37,8 @@ private:
     int k_limit;
     /** @brief Number of available servers */
     int n_server;
+    /** @brief Limit d for the randomly choosen servers list size*/
+    int d_limit;
     /** @brief True if using MemSQ_policy, false instead */
     bool hasMemory;
     /** @brief Server list */

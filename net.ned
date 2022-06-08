@@ -3,6 +3,7 @@ import org.omnetpp.queueing.Deallocate;
 import org.omnetpp.queueing.Delay;
 import org.omnetpp.queueing.PassiveQueue;
 import org.omnetpp.queueing.Queue;
+import org.omnetpp.queueing.ResourceBasedQueue;
 import org.omnetpp.queueing.ResourcePool;
 import org.omnetpp.queueing.Server;
 import org.omnetpp.queueing.SourceOnce;
