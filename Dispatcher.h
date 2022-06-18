@@ -4,6 +4,9 @@
 #include <omnetpp.h>
 #include <vector>
 #include <string.h>
+#include "Job.h"
+
+#include "QueueingDefs.h"
 
 using namespace omnetpp;
 
@@ -44,13 +47,16 @@ private:
     /** @brief Server list */
     std::vector<int> server_list;
 
+    simsignal_t delayedJobsSignal;
+    int currentlyStored;
+
     /**
      * @brief sends the job to the server list and removes it from the idle list
      *
      * @param msg message to send
      * @param sid server id which is going to use the job
      */
-    void sendJob(cMessage *msg, int sid);
+    void sendJob(queueing::Job *job, int sid);
 
     /**
      * @brief The message parameters are read and the server jobs count is decreased
@@ -58,7 +64,7 @@ private:
      * @param msg incoming message
      * @param sid server id
      */
-    void serverUpdate(cMessage *msg, int sid);
+    void serverUpdate(cMessage *job, int sid);
 
     /**
      * @brief Removes the id of the server from the idle servers list

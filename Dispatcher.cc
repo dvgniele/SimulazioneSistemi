@@ -10,20 +10,25 @@ vector<int> idle_servers;
 int n_server = 0;
 int k_limit = 0;
 int d_limit = 0;
+double serviceTime = 0;
 
 void Dispatcher::initialize()
 {
     cout << endl
          << "\t############\t[ " << this->getClassName() << " ]\t############\t" << endl;
 
+    currentlyStored = 0;
+    WATCH(currentlyStored);
+
     sid_label = "server_id";
 
-    cModule* parent = getParentModule();
+    cModule *parent = getParentModule();
 
     n_server = parent->par("n_servers");
     k_limit = par("k_limit");
     d_limit = par("d_limit");
     hasMemory = par("hasMemory");
+    serviceTime = par("serviceTime");
 
     // int *jobs_per_server = new int[n_server];
     memset(jobs_per_server, 0, n_server * sizeof(*jobs_per_server)); // sets the array size to the server count
@@ -44,18 +49,7 @@ void Dispatcher::handleMessage(cMessage *msg)
 {
     cGate *arrivalGate = msg->getArrivalGate();
 
-    if (arrivalGate == gate("source_in"))
-    {
-        //  selecting the server id by selected policy
-        int sid;
-        if (hasMemory)
-            sid = MemSQ_policy();
-        else
-            sid = SQ_policy();
-
-        sendJob(msg, sid);
-    }
-    else
+    if (arrivalGate == gate("ext_in"))
     {
         auto sid_par_name = "server_id";
         auto sid_par = msg->par(sid_par_name);
@@ -65,34 +59,56 @@ void Dispatcher::handleMessage(cMessage *msg)
 
         send(msg, "sink_out");
     }
+    else
+    {
+        queueing::Job *job = check_and_cast<queueing::Job *>(msg);
+
+        if (!job->isSelfMessage())
+        {
+            currentlyStored++;
+            scheduleAt(simTime() + serviceTime, job);
+        }
+        else
+        {
+            job->setDelayCount(job->getDelayCount() + 1);
+            simtime_t d = simTime() - job->getSendingTime();
+            job->setTotalDelayTime(job->getTotalDelayTime() + d);
+
+            currentlyStored--;
+
+            int sid;
+            sid = hasMemory ? MemSQ_policy() : SQ_policy();
+
+            sendJob(job, sid);
+        }
+    }
 }
 
-void Dispatcher::sendJob(cMessage *msg, int sid)
+void Dispatcher::sendJob(queueing::Job *job, int sid)
 {
     removeFromIdleList(sid); //  removing the server id from the idle list
     jobs_per_server[sid]++;  //  increasing the number of jobs of server sid
 
     /*  message parameters setting  */
     // setting parameter: server_id
-    msg->par("server_id").setDoubleValue(sid);
-    // msg->addPar(mpar);
+    job->par("server_id").setDoubleValue(sid);
 
     //  setting parameter: is_idle
-    msg->par("is_idle").setBoolValue(false);
+    job->par("is_idle").setBoolValue(false);
 
     //  setting parameter: n_jobs
-    msg->par("n_jobs").setDoubleValue(jobs_per_server[sid]);
+    job->par("n_jobs").setDoubleValue(jobs_per_server[sid]);
 
     //  sending the job
-    send(msg, "out");
+    send(job, "out");
 }
 
-void Dispatcher::serverUpdate(cMessage *msg, int sid)
+void Dispatcher::serverUpdate(cMessage *job, int sid)
 {
     jobs_per_server[sid]--;
 
     auto idle_par_name = "is_idle";
-    auto idle_par = msg->par(idle_par_name);
+    auto idle_par = job->par(idle_par_name);
     auto isIdle = (int)idle_par.doubleValue();
 
     if (isIdle && idle_servers.size() < k_limit)

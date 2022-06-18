@@ -6,6 +6,7 @@ import org.omnetpp.queueing.Queue;
 import org.omnetpp.queueing.ResourceBasedQueue;
 import org.omnetpp.queueing.ResourcePool;
 import org.omnetpp.queueing.Server;
+import org.omnetpp.queueing.Sink;
 import org.omnetpp.queueing.SourceOnce;
 
 
@@ -22,23 +23,22 @@ network net
         sorg: SourceOnce {
             @display("p=69,69");
         }
-        disp_delay: Delay {
-            @display("p=570,211");
-        }
         dispatcher: Dispatcher {
-            @display("p=160,211");
+            @display("p=417,217");
         }
         serverList: ServerList {
-            @display("p=379,530");
+            @display("p=417,517");
         }
         poissonDelay: PoissonDelay {
-            @display("p=160,69");
+            @display("p=217,69");
+        }
+        sink: Sink {
+            @display("p=69,217");
         }
     connections:
-        dispatcher.out --> disp_delay.in++;
-        disp_delay.out --> serverList.ext_in;
-        serverList.out --> dispatcher.in;
         poissonDelay.out --> dispatcher.source_in;
-        sorg.out --> poissonDelay.src_in;
-        dispatcher.sink_out --> poissonDelay.ext_in;
+        dispatcher.sink_out --> sink.in++;
+        sorg.out --> poissonDelay.in;
+        serverList.out --> dispatcher.ext_in;
+        dispatcher.out --> serverList.ext_in;
 }
