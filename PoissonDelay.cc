@@ -20,30 +20,6 @@ void PoissonDelay::initialize()
 
 void PoissonDelay::handleMessage(cMessage *msg)
 {
-    cGate *arrivalGate = msg->getArrivalGate();
-
-    //  #####   MESSAGE COMING FROM THE EXTERNAL PORT
-    if (arrivalGate == gate("src_in"))
-    {
-        //  initializing parameter: server_id
-        auto mpar = new cMsgPar();
-        mpar->setDoubleValue(0.0);
-        mpar->setName("server_id");
-        msg->addPar(mpar);
-
-        //  initializing parameter: is_idle
-        mpar = new cMsgPar();
-        mpar->setBoolValue(true);
-        mpar->setName("is_idle");
-        msg->addPar(mpar);
-
-        //  initializing parameter: n_jobs
-        mpar = new cMsgPar();
-        mpar->setDoubleValue(0.0);
-        mpar->setName("n_jobs");
-        msg->addPar(mpar);
-    }
-
     //  msg to job conversion
     queueing::Job *job = check_and_cast<queueing::Job *>(msg);
 

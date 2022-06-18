@@ -27,15 +27,14 @@ private:
 protected:
     /**
      * @brief Initialized the PoissonDelay module
-     * 
+     *
      */
     virtual void initialize();
 
     /**
-     * @brief Sets the parameters for each message received coming from the source port
-     *  Adds a delay through a Poisson process with lambda parameter and sends it
-     * 
-     * @param job 
+     * @brief Adds a delay through a Poisson process with lambda parameter and sends it
+     *
+     * @param job
      */
     virtual void handleMessage(cMessage *job);
 };
