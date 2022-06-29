@@ -47,7 +47,8 @@ private:
     /** @brief Server list */
     std::vector<int> server_list;
 
-    simsignal_t delayedJobsSignal;
+    simsignal_t busySignal;
+    simsignal_t idle_list_length_Signal;
     int currentlyStored;
 
     /**

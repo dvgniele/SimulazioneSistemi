@@ -18,6 +18,10 @@ void Dispatcher::initialize()
          << "\t############\t[ " << this->getClassName() << " ]\t############\t" << endl;
 
     currentlyStored = 0;
+    busySignal = registerSignal("busy");
+    idle_list_length_Signal = registerSignal("idle_length");
+    emit(busySignal, false);
+    emit(idle_list_length_Signal, 0);
     WATCH(currentlyStored);
 
     sid_label = "server_id";
@@ -47,6 +51,9 @@ void Dispatcher::initialize()
 
 void Dispatcher::handleMessage(cMessage *msg)
 {
+    if (hasMemory)
+        emit(idle_list_length_Signal, (int)idle_servers.size());
+
     cGate *arrivalGate = msg->getArrivalGate();
 
     if (arrivalGate == gate("ext_in"))
@@ -66,6 +73,9 @@ void Dispatcher::handleMessage(cMessage *msg)
         if (!job->isSelfMessage())
         {
             currentlyStored++;
+
+            emit(busySignal, true);
+
             scheduleAt(simTime() + serviceTime, job);
         }
         else
@@ -76,12 +86,17 @@ void Dispatcher::handleMessage(cMessage *msg)
 
             currentlyStored--;
 
+            emit(busySignal, false);
+
             int sid;
             sid = hasMemory ? MemSQ_policy() : SQ_policy();
 
             sendJob(job, sid);
         }
     }
+
+    if (hasMemory)
+        emit(idle_list_length_Signal, (int)idle_servers.size());
 }
 
 void Dispatcher::sendJob(queueing::Job *job, int sid)
@@ -167,7 +182,7 @@ int Dispatcher::SQ_policy()
 
 int Dispatcher::MemSQ_policy()
 {
-    if (idle_servers.size())
+    if (!idle_servers.size())
         return SQ_policy();
 
     return idle_servers[rand() % idle_servers.size()];

@@ -12,17 +12,18 @@ class PoissonDelay : public cSimpleModule
 {
 private:
     /** @brief lambda parameter for the Poisson process  */
-    int lambda;
+    double lambda;
 
-    simsignal_t delayedJobsSignal;
+    simsignal_t busySignal;
+    
     int currentlyStored;
 
     /**
      * @brief Calculates a delay through a Poisson process with lambda parameter
      *
-     * @return int Delay for the incoming job
+     * @return double Delay for the incoming job
      */
-    int poissonTime();
+    double poissonTime();
 
 protected:
     /**

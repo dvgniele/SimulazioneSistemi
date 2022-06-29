@@ -94,7 +94,7 @@ void Queue::endService(Job *job)
 
 ```
 
-In fine, è stata modificato il metodo ``createJob` dalla classe `Source` in modo tale da creare all'interno dei jobs alcuni parametri necessari al sistema di simulazione
+In fine, è stata modificato il metodo ```createJob``` dalla classe ```Source``` in modo tale da creare all'interno dei jobs alcuni parametri necessari al sistema di simulazione
 
 > in Source.cc
 

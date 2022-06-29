@@ -1,7 +1,9 @@
 simple PoissonDelay
 {
     parameters:
-        volatile int lambda;
+        @signal[busy](type="bool");
+        @statistic[busy](title="server busy state";record=vector?,timeavg;interpolationmode=sample-hold);
+        volatile double lambda;
     gates:
         input in;
         //input ext_in;

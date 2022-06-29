@@ -4,7 +4,7 @@ using namespace std;
 
 Define_Module(PoissonDelay);
 
-int lambda;
+double lambda;
 
 void PoissonDelay::initialize()
 {
@@ -12,6 +12,8 @@ void PoissonDelay::initialize()
          << "\t############\t[ " << this->getClassName() << " ]\t############\t" << endl;
 
     currentlyStored = 0;
+    busySignal = registerSignal("busy");
+    emit(busySignal, false);
     WATCH(currentlyStored);
 
     lambda = par("lambda");
@@ -28,6 +30,7 @@ void PoissonDelay::handleMessage(cMessage *msg)
     {
         currentlyStored++;
 
+        emit(busySignal, true);
         //  a delay is generated for the current message
         double delay = poissonTime();
         scheduleAt(simTime() + delay, job);
@@ -41,12 +44,15 @@ void PoissonDelay::handleMessage(cMessage *msg)
 
         currentlyStored--;
 
+        emit(busySignal, false);
+
         //  the job is sent to the next node
         send(job, "out");
     }
 }
 
-int PoissonDelay::poissonTime()
+double PoissonDelay::poissonTime()
 {
-    return poisson(lambda);
+    double pois = exponential(poisson(lambda));
+    return pois;
 }
