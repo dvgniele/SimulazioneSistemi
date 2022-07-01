@@ -190,7 +190,7 @@ int Dispatcher::MemSQ_policy()
 
 Dispatcher::~Dispatcher()
 {
-    jobs_per_server = new int;
+    //jobs_per_server = new int;
     delete[] jobs_per_server;
     jobs_per_server = NULL;
 }
